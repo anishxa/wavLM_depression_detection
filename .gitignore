@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+*.npy
+*.pkl
+*.pt
+.ipynb_checkpoints/
+log/
+features/
+.DS_Store
+env/
+venv/
+.vscode/
+.idea/.Rhistory
+
+# E-DAIC Raw Data and Audio Chunks
+wwwedaic/
+edaic_chunks/
+edaic_segments/

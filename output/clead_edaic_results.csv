@@ -1,0 +1,7 @@
+Metric,Class_0_Healthy,Class_1_Depressed,Overall
+Accuracy,,,0.9274
+F1 Score,0.94,0.90,0.8997
+ROC AUC,,,0.9829
+Precision,0.95,0.89,
+Recall,0.93,0.91,
+Support,3885,2147,6032
