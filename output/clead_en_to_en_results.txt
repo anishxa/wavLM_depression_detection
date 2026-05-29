@@ -1,18 +1,18 @@
 CLeaD Contrastive Alignment Results
-Accuracy: 0.8256
-F1 Score: 0.7560
-ROC AUC:  0.8998
+Accuracy: 0.8239
+F1 Score: 0.7512
+ROC AUC:  0.9016
 
 Confusion Matrix:
-[[3350  535]
- [ 517 1630]]
+[[3367  518]
+ [ 544 1603]]
 
 Classification Report:
               precision    recall  f1-score   support
 
-           0       0.87      0.86      0.86      3885
-           1       0.75      0.76      0.76      2147
+           0       0.86      0.87      0.86      3885
+           1       0.76      0.75      0.75      2147
 
-    accuracy                           0.83      6032
+    accuracy                           0.82      6032
    macro avg       0.81      0.81      0.81      6032
-weighted avg       0.83      0.83      0.83      6032
+weighted avg       0.82      0.82      0.82      6032

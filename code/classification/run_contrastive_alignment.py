@@ -154,21 +154,13 @@ def main():
         f.write("Classification Report:\n")
         f.write(report)
         
-    # Generate dynamic report dictionary for CSV
+    # Generate dynamic report dictionary for CSV (Clean 4-Column Layout)
     report_dict = classification_report(all_labels, all_preds, zero_division=0, output_dict=True)
     csv_data = {
-        "Metric": ["Accuracy", "F1 Score (Overall)", "ROC AUC", "Precision (Healthy)", "Precision (Depressed)", "Recall (Healthy)", "Recall (Depressed)", "Support (Healthy)", "Support (Depressed)"],
-        "Value": [
-            acc, 
-            f1, 
-            auc, 
-            report_dict['0']['precision'], 
-            report_dict['1']['precision'], 
-            report_dict['0']['recall'], 
-            report_dict['1']['recall'], 
-            report_dict['0']['support'], 
-            report_dict['1']['support']
-        ]
+        "Metric": ["Accuracy", "F1 Score", "ROC AUC", "Precision", "Recall", "Support"],
+        "Class_0_Healthy": ["", report_dict['0']['f1-score'], "", report_dict['0']['precision'], report_dict['0']['recall'], report_dict['0']['support']],
+        "Class_1_Depressed": ["", report_dict['1']['f1-score'], "", report_dict['1']['precision'], report_dict['1']['recall'], report_dict['1']['support']],
+        "Overall": [acc, f1, auc, "", "", report_dict['macro avg']['support']]
     }
     df = pd.DataFrame(csv_data)
     csv_path = os.path.join("output", f"{args.exp_name}_results.csv")
