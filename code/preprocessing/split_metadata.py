@@ -19,6 +19,7 @@ Output:
 """
 
 import os
+import re
 import pandas as pd
 from sklearn.model_selection import GroupShuffleSplit
 import argparse
@@ -34,8 +35,8 @@ args = parser.parse_args()
 df = pd.read_csv(args.input_csv)
 
 # Extract Participant ID from the filename to use as the Group ID.
-# Format is expected to be e.g. ".../300_1.wav", so we extract "300".
-df["participant_id"] = df["file_path"].apply(lambda x: os.path.basename(x).split('_')[0])
+# Uses regex to find the first sequence of digits in the filename (e.g. "300" in "edaic_chunks_300_1.wav").
+df["participant_id"] = df["file_path"].apply(lambda x: re.search(r'\d+', os.path.basename(x)).group())
 
 # step 1: train vs val+test (Group Split to prevent speaker leakage)
 gss_train = GroupShuffleSplit(n_splits=1, train_size=args.train_ratio, random_state=42)
