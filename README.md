@@ -12,7 +12,7 @@ This architecture was designed for submission to SLT.
 
 ## Datasets
 - **E-DAIC:** English corpus used for baseline training and evaluation.
-- **MODMA / CMDC:** Mandarin corpora used to validate zero-shot cross-lingual alignment.
+- **MODMA / MODMA:** Mandarin corpora used to validate zero-shot cross-lingual alignment.
 
 *(Note: Massive audio chunks and `.npy` feature arrays are tracked via `.gitignore` and are not included in this repository).*
 
@@ -32,7 +32,7 @@ To run the segmented `.wav` files through the WavLM transformer:
 ```bash
 python3 code/feature_extraction/extract_edaic_layer.py --metadata utterance_table_edaic_segmented_split.csv --output_dir features/features_edaic_layer6 --layer 6
 ```
-*(Repeat for `extract_cmdc_layer.py` when using Mandarin data).*
+*(Repeat for `extract_modma_layer.py` when using Mandarin data).*
 
 ### 3. Model Training & Evaluation (Ablation Study)
 To prove the effectiveness of the contrastive alignment, run both the "Before CLeaD" (Baseline) and "After CLeaD" models side-by-side.
@@ -40,19 +40,19 @@ To prove the effectiveness of the contrastive alignment, run both the "Before CL
 **EN → ZH (Train on English E-DAIC, Test on Mandarin MODMA)**
 ```bash
 # Before CLeaD
-python3 code/classification/run_baseline_classifier.py --train_data features/features_edaic_layer6 --test_data features/features_cmdc_layer6 --exp_name baseline_EN_to_ZH
+python3 code/classification/run_baseline_classifier.py --train_data features/features_edaic_layer6 --test_data features/features_modma_layer6 --exp_name baseline_EN_to_ZH
 
 # After CLeaD
-python3 code/classification/run_contrastive_alignment.py --train_data features/features_edaic_layer6 --test_data features/features_cmdc_layer6 --exp_name clead_EN_to_ZH
+python3 code/classification/run_contrastive_alignment.py --train_data features/features_edaic_layer6 --test_data features/features_modma_layer6 --exp_name clead_EN_to_ZH
 ```
 
 **ZH → EN (Train on Mandarin MODMA, Test on English E-DAIC)**
 ```bash
 # Before CLeaD
-python3 code/classification/run_baseline_classifier.py --train_data features/features_cmdc_layer6 --test_data features/features_edaic_layer6 --exp_name baseline_ZH_to_EN
+python3 code/classification/run_baseline_classifier.py --train_data features/features_modma_layer6 --test_data features/features_edaic_layer6 --exp_name baseline_ZH_to_EN
 
 # After CLeaD
-python3 code/classification/run_contrastive_alignment.py --train_data features/features_cmdc_layer6 --test_data features/features_edaic_layer6 --exp_name clead_ZH_to_EN
+python3 code/classification/run_contrastive_alignment.py --train_data features/features_modma_layer6 --test_data features/features_edaic_layer6 --exp_name clead_ZH_to_EN
 ```
 
 **MIX → EN (Train on Balanced Mix, Test on English E-DAIC)**
@@ -67,10 +67,10 @@ python3 code/classification/run_contrastive_alignment.py --train_data features/f
 **MIX → ZH (Train on Balanced Mix, Test on Mandarin MODMA)**
 ```bash
 # Before CLeaD
-python3 code/classification/run_baseline_classifier.py --train_data features/features_mix_layer6 --test_data features/features_cmdc_layer6 --exp_name baseline_MIX_to_ZH
+python3 code/classification/run_baseline_classifier.py --train_data features/features_mix_layer6 --test_data features/features_modma_layer6 --exp_name baseline_MIX_to_ZH
 
 # After CLeaD
-python3 code/classification/run_contrastive_alignment.py --train_data features/features_mix_layer6 --test_data features/features_cmdc_layer6 --exp_name clead_MIX_to_ZH
+python3 code/classification/run_contrastive_alignment.py --train_data features/features_mix_layer6 --test_data features/features_modma_layer6 --exp_name clead_MIX_to_ZH
 ```
 
 ## Results

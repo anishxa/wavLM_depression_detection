@@ -1,5 +1,5 @@
 """
-segment_cmdc_sliding.py
+segment_modma_sliding.py
 
 Applies a sliding-window segmentation to CMD-C utterance audio files,
 producing fixed-length overlapping segments for feature extraction.
@@ -11,12 +11,12 @@ Each segment is saved as a .wav file and logged in a new metadata CSV that
 can be used directly by the feature extraction scripts.
 
 Input:
-    utterance_table_cmdc_balanced.csv -- CSV with columns 'file_path' and
+    utterance_table_modma_balanced.csv -- CSV with columns 'file_path' and
     'label' pointing to the balanced CMD-C utterance audio files.
 
 Output:
     <output_dir>/<parent>_<base>_seg<i>.wav -- Individual segment audio files.
-    utterance_table_cmdc_segmented.csv -- Metadata CSV with columns
+    utterance_table_modma_segmented.csv -- Metadata CSV with columns
     'file_path' and 'label' for every generated segment.
 """
 
@@ -26,8 +26,8 @@ from tqdm import tqdm
 import pandas as pd
 
 # parameters
-source_csv = "/scratch/s5944562/WavLM/cmdc/utterance_table_cmdc_balanced.csv"
-output_dir = "/scratch/s5944562/WavLM/datasets/cmdc_segments"
+source_csv = "utterance_table_modma_balanced.csv"
+output_dir = "modma_segments"
 window_length = 3.0  # seconds
 stride = 1.5         # seconds (50% overlap)
 target_sr = 16000
@@ -73,5 +73,5 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
 
 # save new metadata
 seg_df = pd.DataFrame(segments)
-seg_df.to_csv("utterance_table_cmdc_segmented.csv", index=False)
+seg_df.to_csv("utterance_table_modma_segmented.csv", index=False)
 print(f"done! total segments: {len(seg_df)}")

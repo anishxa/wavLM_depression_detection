@@ -59,11 +59,17 @@ def main():
     test_loader = DataLoader(full_test, batch_size=args.batch_size, shuffle=False)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Compute class weights from training labels to handle imbalance
+    y_all_tensor = full_train.tensors[1]
+    class_counts = torch.bincount(y_all_tensor)
+    total = y_all_tensor.size(0)
+    class_weights = total / (len(class_counts) * class_counts.float())
+    class_weights = class_weights.to(device)
     print(f"Using device: {device}")
 
     model = ContrastiveAlignmentNet(input_dim=768, proj_dim=128, num_classes=2).to(device)
     
-    criterion_ce = nn.CrossEntropyLoss()
+    criterion_ce = nn.CrossEntropyLoss(weight=class_weights)
     criterion_supcon = SupConLoss(temperature=0.07)
     optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
 

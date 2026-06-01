@@ -1,5 +1,5 @@
 """
-create_cmdc_utterance_table.py
+create_modma_utterance_table.py
 
 Scans the CMD-C dataset directory structure and builds an utterance-level
 metadata CSV, filtering out audio files that are too short or too long.
@@ -8,7 +8,7 @@ Walks the HC and MDD subdirectories under root_dir, checks the duration of
 every .wav file using torchaudio, and records files whose duration falls
 within [MIN_SEC, MAX_SEC]. Each entry stores the absolute file path and a
 binary label (0 = HC, 1 = MDD). The resulting table is written to
-utterance_table_cmdc_updated.csv.
+utterance_table_modma_updated.csv.
 
 Expected directory layout:
     root_dir/
@@ -20,7 +20,7 @@ Expected directory layout:
                 *.wav
 
 Output:
-    utterance_table_cmdc_updated.csv -- CSV with columns 'file_path' and
+    utterance_table_modma_updated.csv -- CSV with columns 'file_path' and
     'label' (0 = HC, 1 = MDD), filtered to [MIN_SEC, MAX_SEC] duration.
 """
 
@@ -29,8 +29,8 @@ import csv
 import torchaudio
 
 # set paths and output file
-root_dir = "/scratch/s5944562/WavLM/datasets/cmdc"
-output_csv = "utterance_table_cmdc_updated.csv"
+root_dir = "/scratch/s5944562/WavLM/datasets/modma"
+output_csv = "utterance_table_modma_updated.csv"
 data = []
 
 # duration filter (seconds)

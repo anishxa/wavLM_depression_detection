@@ -1,5 +1,5 @@
 """
-extract_cmdc_layer.py
+extract_modma_layer.py
 
 Extracts WavLM hidden-state features from CMD-C audio utterances and saves
 them as numpy arrays for downstream classification.
@@ -8,16 +8,9 @@ The script loads the pre-trained facebook/wavlm-base-ls960 model and iterates
 over the train/val/test splits defined in a segmented metadata CSV. For each
 audio file, it resamples to 16 kHz if needed, downmixes stereo to mono, runs
 the waveform through WavLM, and mean-pools the hidden states of the specified
-layer to produce a 768-dimensional feature vector. Partial progress is saved
-after each split so the job can be safely resumed if interrupted.
+layer to produce a 768-dimensional feature vector.
 
-Args (command-line):
-    --layer (int): Index of the WavLM hidden layer to extract (default: 6).
-
-Outputs:
-    X_{split}.npy  -- Feature matrix of shape (N, 768) for each split.
-    y_{split}.npy  -- Binary label array of shape (N,) for each split.
-    Files are written to output_dir, which is derived from the --layer argument.
+This script detects Apple Silicon (MPS) or CUDA GPUs to accelerate extraction.
 """
 
 import os
@@ -35,12 +28,16 @@ parser.add_argument("--layer", type=int, default=6, help="WavLM layer index to e
 args = parser.parse_args()
 
 # === path settings ===
-metadata_path = "/scratch/s5944562/WavLM/utterance_table_cmdc_segmented_split.csv"
-output_dir = f"/scratch/s5944562/WavLM/features_cmdc_layer{args.layer}"
+metadata_path = "utterance_table_modma_segmented_split.csv"
+output_dir = f"features/features_modma_layer{args.layer}"
 os.makedirs(output_dir, exist_ok=True)
 
+# === device selection ===
+device = torch.device("mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device} for feature extraction")
+
 # === load model and feature extractor ===
-model = WavLMModel.from_pretrained("microsoft/wavlm-base-plus", output_hidden_states=True).eval()
+model = WavLMModel.from_pretrained("microsoft/wavlm-base-plus", output_hidden_states=True).to(device).eval()
 extractor = Wav2Vec2FeatureExtractor.from_pretrained("microsoft/wavlm-base-plus")
 
 
@@ -52,16 +49,6 @@ def extract_features(df_split, split_name):
     hidden state from the WavLM layer specified by args.layer. Results are
     appended to X_{split_name}.npy and y_{split_name}.npy incrementally,
     allowing the job to resume from a previous checkpoint if those files exist.
-
-    Args:
-        df_split (pd.DataFrame): Metadata slice for one split. Must contain
-            columns 'file_path' (str) and 'label' (int, binary 0/1).
-        split_name (str): Name of the split, e.g. 'train', 'val', or 'test'.
-            Used to name the output .npy files.
-
-    Side effects:
-        Writes X_{split_name}.npy and y_{split_name}.npy to output_dir.
-        Prints progress and any skipped/failed files to stdout.
     """
     X_list, y_list = [], []
 
@@ -96,10 +83,11 @@ def extract_features(df_split, split_name):
 
             # Feature extraction
             inputs = extractor(waveform.squeeze().numpy(), sampling_rate=16000, return_tensors="pt")
+            inputs = {k: v.to(device) for k, v in inputs.items()}
             with torch.no_grad():
                 out = model(**inputs)
                 layer_feat = out.hidden_states[args.layer]
-                pooled = layer_feat.mean(dim=1).squeeze().numpy()
+                pooled = layer_feat.mean(dim=1).squeeze().cpu().numpy()
 
             if pooled.shape == (768,):
                 X_list.append(pooled)
